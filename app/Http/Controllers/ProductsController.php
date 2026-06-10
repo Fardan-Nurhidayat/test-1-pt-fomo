@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StatusProduct;
+use App\Http\Requests\CreateProduct;
 use App\Models\Products;
 use Illuminate\Http\Request;
 
@@ -30,9 +32,23 @@ class ProductsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateProduct $request)
     {
-        //   
+        try {
+            $validatedData = $request->validated();
+            $product = Products::create($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil dibuat',
+                'data' => $product,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat produk: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

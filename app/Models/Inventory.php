@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Inventory extends Model
 {
@@ -12,8 +13,10 @@ class Inventory extends Model
         'products_id',
         'quantity',
         'reserved_quantity',
-        'version',
-        'locked_until',
-        'updated_by_user_id'
     ];
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Products::class, 'products_id');
+    }
 }

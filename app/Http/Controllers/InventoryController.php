@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateInventory;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,11 @@ class InventoryController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengambil data inventory',
+            'data' => Inventory::all(),
+        ]);
     }
 
     /**
@@ -26,9 +31,28 @@ class InventoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateInventory $request)
     {
-        //   
+        try {
+            $validatedData = $request->validated();
+            $inventory = Inventory::create([
+                'products_id' => $validatedData['products_id'],
+                'quantity' => $validatedData['quantity'],
+                'reserved_quantity' => 0,
+                'locked_until' => null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Inventory berhasil dibuat',
+                'data' => $inventory,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat inventory: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

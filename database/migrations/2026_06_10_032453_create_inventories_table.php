@@ -15,16 +15,12 @@ return new class extends Migration
         Schema::create('inventory', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Products::class)->constrained()->cascadeOnDelete();
-            $table->foreignId('updated_by_user_id')->constrained('users')->cascadeOnDelete();
             $table->integer('quantity')->default(0);
             $table->integer('reserved_quantity')->default(0);
-            $table->integer('version')->unsigned()->default(1);
-            $table->timestamp('locked_until')->nullable();
             $table->timestamps();
 
             $table->index('products_id');
             $table->index('quantity');
-            $table->index('updated_by_user_id');
         });
     }
 

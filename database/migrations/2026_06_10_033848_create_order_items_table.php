@@ -22,7 +22,6 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2);
             $table->decimal('discount_percentage', 5, 2)->default(0);
             $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('total_price', 10, 2);
             $table->boolean('is_flash_sale_item')->default(false);
             $table->timestamps();
 

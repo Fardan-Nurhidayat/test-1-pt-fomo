@@ -23,14 +23,10 @@ return new class extends Migration
             $table->decimal('discount_applied', 10, 2)->default(0);
             $table->string('notes')->nullable();
             $table->timestamps();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamp('shipped_at')->nullable();
-            $table->timestamp('cancelled_at')->nullable();
 
             $table->index('order_number');
             $table->index('user_id');
             $table->index('flash_sale_id');
-            $table->index('status');
         });
     }
 

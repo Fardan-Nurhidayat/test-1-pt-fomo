@@ -60,7 +60,18 @@ class InventoryController extends Controller
      */
     public function show(Inventory $inventory)
     {
-        //
+        try {
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengambil data inventory',
+                'data' => $inventory,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data inventory: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

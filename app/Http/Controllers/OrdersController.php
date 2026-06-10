@@ -55,11 +55,16 @@ class OrdersController extends Controller
 
                 $inventory->quantity -= $item['quantity'];
                 $inventory->reserved_quantity += $item['quantity'];
-                if ($validatedData['flash_sale_id']) {
+                
+                $unitPrice = 0;
+                $subTotal = 0;
+                $discountAmount = 0;
+                $discountPercentage = 0;
+
+                if (isset($validatedData['flash_sale_id'])) {
                     $flashSale = FlashSale::find($validatedData['flash_sale_id']);
                     if ($flashSale && $flashSale->products_id == $item['products_id'] && $flashSale->status == 'active') {
                         $unitPrice = Products::find($item['products_id'])->base_price * (1 - $flashSale->discount_value / 100);
-                        $subTotal = $unitPrice * $item['quantity'];
                         $discountAmount = Products::find($item['products_id'])->base_price * ($flashSale->discount_value / 100) * $item['quantity'];
                         $discountPercentage = $flashSale->discount_value;
                     } else {
@@ -68,30 +73,37 @@ class OrdersController extends Controller
                 } else {
                     $unitPrice = Products::find($item['products_id'])->base_price;
                 }
+                
+                $subTotal = $unitPrice * $item['quantity'];
+
                 $order->orderItems()->create([
                     'products_id' => $item['products_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $unitPrice,
-                    'subtotal' => $subTotal ?? ($unitPrice * $item['quantity']),
-                    'discount_amount' => $discountAmount ?? 0,
-                    'discount_percentage' => $discountPercentage ?? 0,
+                    'subtotal' => $subTotal,
+                    'discount_amount' => $discountAmount,
+                    'discount_percentage' => $discountPercentage,
                     'is_flash_sale_item' => isset($flashSale) && $flashSale->status == 'active' ? true : false,
                 ]);
 
-                $order->update([
-                    'total_price' => $order->orderItems()->sum('subtotal'),
-                    'discount_applied' => $order->orderItems()->sum('discount_amount'),
-                ]);
-                $order->status = OrderStatus::PAID->value;
-                $order->save();
                 $inventory->save();
-                DB::commit();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Order berhasil dibuat',
-                    'data' => $order->load('orderItems'),
-                ], 201);
-            };
+            }
+
+            $order->update([
+                'total_price' => $order->orderItems()->sum('subtotal'),
+                'discount_applied' => $order->orderItems()->sum('discount_amount'),
+            ]);
+            $order->status = OrderStatus::PAID->value;
+            $order->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order berhasil dibuat',
+                'data' => $order->load('orderItems'),
+            ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

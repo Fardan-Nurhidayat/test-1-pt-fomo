@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pestconfig>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Race">
+            <directory>tests/Race</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory>src/config</directory>
+        </exclude>
+    </coverage>
+
+    <!-- Parallel execution untuk race condition test -->
+    <php>
+        <env name="PEST_PARALLEL_PROCESSES" value="10"/>
+    </php>
+</pestconfig>
